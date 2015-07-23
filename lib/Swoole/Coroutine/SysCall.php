@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @Author: winterswang
  * @Date:   2015-07-04 22:43:59
@@ -8,9 +9,11 @@
 
 namespace Swoole\Coroutine;
 
-class SysCall {
-
-	public static function end($words){
-		return new RetVal($words);
-	}
+class SysCall
+{
+  
+  public static function end($words)
+  {
+    return new RetVal($words);
+  }
 }

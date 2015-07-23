@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: yuanyizhi
@@ -8,22 +9,20 @@
 
 class Filter
 {
-
-    //初始化
-    public function init()
-    {
-
-    }
-
-    //前面filter
-    static public function preFilter($data)
-    {
-        return true;
-    }
-
-    //后面filter
-    static public function postFilter($data)
-    {
-    }
-
+  
+  //初始化
+  public function init()
+  {
+  }
+  
+  //前面filter
+  static public function preFilter($data)
+  {
+    return true;
+  }
+  
+  //后面filter
+  static public function postFilter($data)
+  {
+  }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @Author: markyuan
  * @Date:   2015-3-2
@@ -9,6 +10,4 @@
  */
 class TcpController extends Controller
 {
-
-
 }

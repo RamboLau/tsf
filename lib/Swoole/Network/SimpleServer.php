@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: jimmyszhou
@@ -9,6 +10,5 @@
  */
 class SimpleServer extends Swoole\Server implements Swoole\Server\Driver
 {
-    protected $mode = SWOOLE_BASE;
-
+  protected $mode = SWOOLE_BASE;
 }

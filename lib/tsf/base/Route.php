@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: yuanyizhi
@@ -8,5 +9,4 @@
 
 abstract class Route
 {
-
 }
