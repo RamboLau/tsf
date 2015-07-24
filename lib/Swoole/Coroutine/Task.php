@@ -32,6 +32,7 @@ class Task
     // init stack
     //$this ->add($coroutine);
     
+    
   }
   
   /**
@@ -65,8 +66,8 @@ class Task
       try {
         
         /*
-                    异常处理
-        */
+         * 异常处理
+         */
         if ($this->exception) {
           
           $gen->throw($this->exception);
@@ -78,8 +79,8 @@ class Task
         \SysLog::info(__METHOD__ . " value === " . print_r($value, true) , __CLASS__);
         
         /*
-                    中断内嵌 继续入栈
-        */
+         * 中断内嵌 继续入栈
+         */
         if ($value instanceof \Generator) {
           
           $this->corStack->push($gen);
@@ -89,8 +90,8 @@ class Task
         }
         
         /*
-                    if value is null and stack is not empty pop and send continue
-        */
+         * if value is null and stack is not empty pop and send continue
+         */
         if (is_null($value) && !$this->corStack->isEmpty()) {
           
           \SysLog::info(__METHOD__ . " values is null stack pop and send", __CLASS__);
@@ -107,8 +108,8 @@ class Task
         }
         
         /*
-                    中断内容为异步IO 发包 返回
-        */
+         * 中断内容为异步IO 发包 返回
+         */
         if (is_subclass_of($value, 'Swoole\Client\Base')) {
           
           //async send push gen to stack
@@ -121,8 +122,8 @@ class Task
         }
         
         /*
-                    出栈，回射数据
-        */
+         * 出栈，回射数据
+         */
         if ($this->corStack->isEmpty()) {
           return;
         }
@@ -135,8 +136,8 @@ class Task
         if ($this->corStack->isEmpty()) {
           
           /*
-                        throw the exception 
-          */
+           * throw the exception 
+           */
           \SysLog::error(__METHOD__ . " exception ===" . $e->getMessage() , __CLASS__);
           return;
         }

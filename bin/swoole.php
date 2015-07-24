@@ -252,9 +252,14 @@ function StartServSock($RunServer)
   //$serv->setGlobal();
   $serv->on('WorkerStart', function ($serv, $workerId)
   {
-    
-    //监控周期
-    $serv->addtimer(1000);
+    // 只有当worker_id为0时才添加定时器,避免重复添加
+    if($workerId == 0) {
+      // 定时任务, 100ms检测一次任务队列
+      $serv->addtimer(100);
+
+      // 监控周期
+      $serv->addtimer(1000);
+    }
   });
   
   //定时器中操作 主要为轮巡 启动服务
@@ -266,21 +271,35 @@ function StartServSock($RunServer)
       
       return;
     }
-    
-    foreach ($serv->runServer as $serverName) {
-      $ret = system('ps aux | grep ' . $serverName['name'] . ' | grep master | grep -v grep ');
-      StartLogTimer(__LINE__ . ' cmd is ' . 'ps aux | grep ' . $serverName['name'] . ' | grep master | grep -v grep ' . print_r($ret, true));
-      if (empty($ret)) {
-        
-        //挂了 什么都没有  之后可能要通过数量来获取
-        //todo
-        StartServ($serverName['php'], 'start', $serverName['name']);
-        StartLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($serverName, true) . ' server is dead , start to restart' . PHP_EOL);
-      } 
-      else {
-        StartLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($serverName, true) . ' server is running success' . PHP_EOL);
-      }
+
+    switch ($interval) {
+      case 100:
+        queueLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($serverName, true) . ' queue');
+
+        // 从redis导入队列
+        $APIModel = new APIModel();
+              $rets = (yield $APIModel->HttpMuticall());
+        queueLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($rets, true) . ' queue');
+        break;
+      
+      default:
+        foreach ($serv->runServer as $serverName) {
+          $ret = system('ps aux | grep ' . $serverName['name'] . ' | grep master | grep -v grep ');
+          StartLogTimer(__LINE__ . ' cmd is ' . 'ps aux | grep ' . $serverName['name'] . ' | grep master | grep -v grep ' . print_r($ret, true));
+          if (empty($ret)) {
+            
+            //挂了 什么都没有  之后可能要通过数量来获取
+            //todo
+            StartServ($serverName['php'], 'start', $serverName['name']);
+            StartLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($serverName, true) . ' server is dead , start to restart' . PHP_EOL);
+          } 
+          else {
+            StartLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($serverName, true) . ' server is running success' . PHP_EOL);
+          }
+        }
+        break;
     }
+
   });
   $serv->on('connect', function ($serv, $fd, $from_id)
   {
@@ -311,14 +330,11 @@ function StartServSock($RunServer)
       //如果没有，则读取配置
       $retConf = getServerIni($opData['server']);
       if ($retConf['r'] != 0) {
-        
         //
         $serv->send($fd, json_encode($retConf));
-        
         return;
       } 
       else {
-        
         //正常启动
         $phpStart = $retConf['conf']['server']['php'];
         StartServ($phpStart, 'start', $opData['server']);
@@ -475,6 +491,11 @@ function StartLog($msg)
 function StartLogTimer($msg)
 {
   error_log($msg . PHP_EOL, 3, '/tmp/SuperMasterTimer.log');
+}
+
+function queueLogTimer($msg)
+{
+  error_log($msg . PHP_EOL, 3, 'tmp/queueLogTimer.log');
 }
 
 function StartServ($phpStart, $cmd, $name)

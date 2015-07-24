@@ -90,7 +90,7 @@ class MYSQL extends Base
   {
     
     $this->sql = $sql;
-    yield$this;
+    yield $this;
   }
   
   /**

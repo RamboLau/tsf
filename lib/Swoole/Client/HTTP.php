@@ -407,6 +407,10 @@ class HTTP extends Base
     });
     
     $this->callback = $callback;
+    $client->set(array(
+      'open_eof_check' => false
+    ));
+    
     if ($client->connect($this->host, $this->port, $this->timeout)) {
       
       $this->calltime = microtime(true);
