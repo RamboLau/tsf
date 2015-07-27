@@ -249,13 +249,21 @@ function StartServSock($RunServer)
     'daemonize' => true
   ));
   
-  //$serv->setGlobal();
   $serv->on('WorkerStart', function ($serv, $workerId)
   {
     // 只有当worker_id为0时才添加定时器,避免重复添加
     if($workerId == 0) {
       // 定时任务, 100ms检测一次任务队列
-      $serv->addtimer(100);
+
+      // 从redis导入队列
+      /*$serv->tick(100, function($id, $server) {
+        $server->task(
+          json_encode(array(
+
+          ));
+        );
+       queueLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($serv, true) . ' queue');
+      });*/
 
       // 监控周期
       $serv->addtimer(1000);
@@ -273,15 +281,12 @@ function StartServSock($RunServer)
     }
 
     switch ($interval) {
+      // for 100ms
       case 100:
         queueLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($serverName, true) . ' queue');
-
-        // 从redis导入队列
-        $APIModel = new APIModel();
-              $rets = (yield $APIModel->HttpMuticall());
-        queueLogTimer(__LINE__ . date('Y-m-d H:i:s') . '  ' . print_r($rets, true) . ' queue');
         break;
       
+      // for 1000ms
       default:
         foreach ($serv->runServer as $serverName) {
           $ret = system('ps aux | grep ' . $serverName['name'] . ' | grep master | grep -v grep ');
